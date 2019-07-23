@@ -61,6 +61,7 @@ MongoDB 4.0 is currently experimental - we would happily accept PRs to help impr
 * Implement MongoTimestamp ([details](https://github.com/BHRTech/mgo/pull/171))
 * Support setting `writeConcern` for `findAndModify` operations ([details](https://github.com/BHRTech/mgo/pull/185))
 * Add `ssl` to the dial string options ([details](https://github.com/BHRTech/mgo/pull/184))
+* Switched ObjectID type from string to []byte slice ([details]())
 
 
 ---
