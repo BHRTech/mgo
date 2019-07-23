@@ -201,7 +201,7 @@ type RawDocElem struct {
 // property.
 //
 // http://www.mongodb.org/display/DOCS/Object+Ids
-type ObjectId string
+type ObjectId []byte
 
 // ObjectIdHex returns an ObjectId from the provided hex representation.
 // Calling this function with an invalid hex representation will
@@ -330,7 +330,7 @@ func (id *ObjectId) UnmarshalJSON(data []byte) error {
 		}
 	}
 	if len(data) == 2 && data[0] == '"' && data[1] == '"' || bytes.Equal(data, nullBytes) {
-		*id = ""
+		*id = nil
 		return nil
 	}
 	if len(data) != 26 || data[0] != '"' || data[25] != '"' {
@@ -353,7 +353,7 @@ func (id ObjectId) MarshalText() ([]byte, error) {
 // UnmarshalText turns *bson.ObjectId into an encoding.TextUnmarshaler.
 func (id *ObjectId) UnmarshalText(data []byte) error {
 	if len(data) == 1 && data[0] == ' ' || len(data) == 0 {
-		*id = ""
+		*id = nil
 		return nil
 	}
 	if len(data) != 24 {

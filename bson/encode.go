@@ -44,8 +44,8 @@ import (
 
 var (
 	typeBinary         = reflect.TypeOf(Binary{})
-	typeObjectId       = reflect.TypeOf(ObjectId(""))
-	typeDBPointer      = reflect.TypeOf(DBPointer{"", ObjectId("")})
+	typeObjectId       = reflect.TypeOf(ObjectId([]byte{}))
+	typeDBPointer      = reflect.TypeOf(DBPointer{"", ObjectId([]byte{})})
 	typeSymbol         = reflect.TypeOf(Symbol(""))
 	typeMongoTimestamp = reflect.TypeOf(MongoTimestamp(0))
 	typeOrderKey       = reflect.TypeOf(MinKey)
@@ -378,13 +378,6 @@ func (e *encoder) addElem(name string, v reflect.Value, minSize bool) {
 	case reflect.String:
 		s := v.String()
 		switch v.Type() {
-		case typeObjectId:
-			if len(s) != 12 {
-				panic("ObjectIDs must be exactly 12 bytes long (got " +
-					strconv.Itoa(len(s)) + ")")
-			}
-			e.addElemName(0x07, name)
-			e.addBytes([]byte(s)...)
 		case typeSymbol:
 			e.addElemName(0x0E, name)
 			e.addStr(s)
@@ -464,7 +457,15 @@ func (e *encoder) addElem(name string, v reflect.Value, minSize bool) {
 	case reflect.Slice:
 		vt := v.Type()
 		et := vt.Elem()
-		if et.Kind() == reflect.Uint8 {
+		if vt == typeObjectId {
+			id := v.Bytes()
+			if len(id) != 12 {
+				panic("ObjectIDs must be exactly 12 bytes long (got " +
+					strconv.Itoa(len(id)) + ")")
+			}
+			e.addElemName(0x07, name)
+			e.addBytes([]byte(id)...)
+		} else if et.Kind() == reflect.Uint8 {
 			if arrayOps[name] {
 				e.addElemName(0x04, name)
 				e.addDoc(v)
